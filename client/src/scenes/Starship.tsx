@@ -19,7 +19,7 @@ export default function Starship() {
     searchTerm: any,
     page = 1,
     limit = 10,
-    link = `http://localhost:5000/api/starships`
+    link = `${process.env.REACT_APP_SWAPI_API}/starships`
   ) => {
     try {
       const response = await axios.get(link, {
@@ -30,7 +30,6 @@ export default function Starship() {
         },
       });
       console.log("Fetched data:", response.data);
-      // Ensure we handle cases where response.data.results is not defined
       setStarships(response.data.results || []);
       setApi({
         totalPages: response.data.totalPages || 0,
@@ -38,7 +37,7 @@ export default function Starship() {
       });
     } catch (error) {
       console.error("Error fetching starships:", error);
-      setStarships([]); // Set starships to an empty array in case of error
+      setStarships([]);
     }
   };
 

@@ -22,7 +22,7 @@ export default function Planet() {
     searchTerm = "",
     page = 1,
     limit = 10,
-    link = `http://localhost:5000/api/planets`
+    link = `${process.env.REACT_APP_SWAPI_API}/planets`
   ) => {
     try {
       const response = await axios.get(link, {
@@ -43,7 +43,7 @@ export default function Planet() {
       });
     } catch (error) {
       console.error("Error fetching planets:", error);
-      setPlanets([]); // Set planets to an empty array in case of error
+      setPlanets([]);
     }
   };
 

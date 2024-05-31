@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 
-// Fetch and store characters from SWAPI
 router.get("/fetch", async (req, res) => {
   try {
     const response = await axios.get("https://swapi.dev/api/people/");
@@ -13,7 +12,6 @@ router.get("/fetch", async (req, res) => {
   }
 });
 
-// Proxy to fetch characters with pagination from SWAPI
 router.get("/", async (req, res) => {
   try {
     const { search = "", page = 1 } = req.query;
@@ -36,10 +34,14 @@ router.get("/", async (req, res) => {
       totalPages,
       currentPage,
       next: nextPage
-        ? `http://localhost:5000/api/characters?page=${nextPage}&search=${search}`
+        ? `http://localhost:${
+            process.env.PORT || 5000
+          }/api/characters?page=${nextPage}&search=${search}`
         : null,
       previous: previousPage
-        ? `http://localhost:5000/api/characters?page=${previousPage}&search=${search}`
+        ? `http://localhost:${
+            process.env.PORT || 5000
+          }/api/characters?page=${previousPage}&search=${search}`
         : null,
       count,
     });

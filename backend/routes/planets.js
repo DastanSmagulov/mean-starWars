@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 
-// Fetch and store planets from SWAPI
 router.get("/fetch", async (req, res) => {
   try {
     const response = await axios.get("https://swapi.dev/api/planets/");
@@ -13,7 +12,6 @@ router.get("/fetch", async (req, res) => {
   }
 });
 
-// Proxy to fetch planets with pagination from SWAPI
 router.get("/", async (req, res) => {
   try {
     const { search = "", page = 1 } = req.query;
@@ -36,10 +34,14 @@ router.get("/", async (req, res) => {
       totalPages,
       currentPage,
       next: nextPage
-        ? `http://localhost:5000/api/planets?page=${nextPage}&search=${search}`
+        ? `http://localhost:${
+            process.env.PORT || 5000
+          }/api/planets?page=${nextPage}&search=${search}`
         : null,
       previous: previousPage
-        ? `http://localhost:5000/api/planets?page=${previousPage}&search=${search}`
+        ? `http://localhost:${
+            process.env.PORT || 5000
+          }/api/planets?page=${previousPage}&search=${search}`
         : null,
       count,
     });

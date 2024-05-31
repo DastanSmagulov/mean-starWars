@@ -16,15 +16,6 @@ const CardComponents: React.FC<CardProps> = ({
   thirdCharacteristics,
   thirdCharacteristicsContent,
 }) => {
-  console.log("Rendering CardComponent with:", {
-    title,
-    characteristics,
-    characteristicsContent,
-    secondCharacteristics,
-    secondCharacteristicsContent,
-    thirdCharacteristics,
-    thirdCharacteristicsContent,
-  });
   return (
     <div className="card card-compact w-96 max-xl:w-72 bg-base-100 shadow-xl border border-solid border-white">
       <figure>{/* <img src={img} alt="Shoes" /> */}</figure>

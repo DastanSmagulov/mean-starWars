@@ -1,8 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const axios = require("axios");
-const Character = require("./models/Character");
 const characterRoutes = require("./routes/characters");
 const planetRoutes = require("./routes/planets");
 const starshipRoutes = require("./routes/starships");
@@ -13,7 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const mongoURI = "mongodb://127.0.0.1:27017/swapi";
+const mongoURI = process.env.MONGO_URI;
 
 mongoose
   .connect(mongoURI, {
