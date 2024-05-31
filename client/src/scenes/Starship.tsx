@@ -5,58 +5,78 @@ import Pagination from "../components/Pagination";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CardComponents from "../components/CardComponent";
-export default function Starships() {
+
+export default function Starship() {
+  const [starships, setStarships] = useState<any[]>([]);
+  const [api, setApi] = useState({
+    totalPages: 0,
+    currentPage: 1,
+  });
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [api, setApi] = useState("");
-  const [starship, setStarship] = useState<any[]>([]);
+
   const fetchData = async (
     searchTerm: any,
+    page = 1,
+    limit = 10,
     link = `http://localhost:5000/api/starships`
   ) => {
     try {
       const response = await axios.get(link, {
         params: {
           search: searchTerm,
+          page,
+          limit,
         },
       });
-      console.log("Fetched data:", response.data); // Add this line
-      setStarship(response.data);
-      setApi(response.data);
+      console.log("Fetched data:", response.data);
+      // Ensure we handle cases where response.data.results is not defined
+      setStarships(response.data.results || []);
+      setApi({
+        totalPages: response.data.totalPages || 0,
+        currentPage: response.data.currentPage || 1,
+      });
     } catch (error) {
-      console.error("Error fetching planets:", error);
+      console.error("Error fetching starships:", error);
+      setStarships([]); // Set starships to an empty array in case of error
     }
   };
+
   useEffect(() => {
-    fetchData(searchTerm);
-  }, [searchTerm]);
-  console.log(starship);
+    fetchData(searchTerm, api.currentPage);
+  }, [searchTerm, api.currentPage]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between ship-box">
+    <main className="flex min-h-screen flex-col items-center justify-between galaxy-box">
       <Header />
       <div className="pt-10">
-        <h1 className="text-2xl font-bold  text-center mb-4">Starships</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Starships</h1>
         <div className="grow max-md:hidden mr-4 mb-6">
           <input
             type="text"
-            placeholder="поиск по названию корабля"
+            placeholder="Search by starship name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-2 rounded-[0.6rem] w-full h-[2.5rem] pl-[.9rem]"
+            className="border border-2 bg-transparent rounded-[0.6rem] w-full h-[2.5rem] pl-[.9rem]"
           />
         </div>
         <div className="grid grid-cols-3 gap-4 max-lg:grid-cols-1">
-          {starship?.map((ship: any) => (
-            <CardComponents
-              key={ship?.id}
-              title={ship?.name?.toString()}
-              characteristics={"manufacturer"}
-              characteristicsContent={ship?.manufacturer?.toString()}
-              secondCharacteristics={"model"}
-              secondCharacteristicsContent={ship?.model?.toString()}
-              thirdCharacteristics={"cost in credits"}
-              thirdCharacteristicsContent={ship?.cost_in_credits?.toString()}
-            />
-          ))}
+          {starships.length > 0 ? (
+            starships.map((starship: any) => (
+              <CardComponents
+                key={starship?.url}
+                title={starship?.name?.toString()}
+                characteristics={"model"}
+                characteristicsContent={starship?.model?.toString()}
+                secondCharacteristics={"manufacturer"}
+                secondCharacteristicsContent={starship?.manufacturer?.toString()}
+                thirdCharacteristics={"cost in credits"}
+                thirdCharacteristicsContent={starship?.cost_in_credits?.toString()}
+              />
+            ))
+          ) : (
+            <p>No starships found</p>
+          )}
         </div>
       </div>
       <Pagination fetchData={fetchData} api={api} name={"starships"} />

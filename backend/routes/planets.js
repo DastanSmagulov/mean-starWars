@@ -1,43 +1,47 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const Planet = require("../models/Planet");
 
 // Fetch and store planets from SWAPI
 router.get("/fetch", async (req, res) => {
   try {
     const response = await axios.get("https://swapi.dev/api/planets/");
     const planets = response.data.results;
-
-    await Planet.deleteMany(); // Clear existing data
-
-    const savedPlanets = await Planet.insertMany(planets);
-    res.json(savedPlanets);
+    res.json(planets);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Get all planets with pagination and search
+// Proxy to fetch planets with pagination from SWAPI
 router.get("/", async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 10 } = req.query;
-    const searchRegex = new RegExp(search, "i"); // Case-insensitive search
-    const offset = (page - 1) * limit;
+    const { search = "", page = 1 } = req.query;
+    let url = `https://swapi.dev/api/planets/?page=${page}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
 
-    const planets = await Planet.find({ name: { $regex: searchRegex } })
-      .limit(parseInt(limit))
-      .skip(parseInt(offset))
-      .exec();
+    const response = await axios.get(url);
+    const results = response.data.results;
+    const count = response.data.count;
+    const totalPages = Math.ceil(count / 10);
+    const currentPage = parseInt(page, 10);
 
-    const count = await Planet.countDocuments({
-      name: { $regex: searchRegex },
-    });
+    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+    const previousPage = currentPage > 1 ? currentPage - 1 : null;
 
     res.json({
-      results: planets,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
+      results,
+      totalPages,
+      currentPage,
+      next: nextPage
+        ? `http://localhost:5000/api/planets?page=${nextPage}&search=${search}`
+        : null,
+      previous: previousPage
+        ? `http://localhost:5000/api/planets?page=${previousPage}&search=${search}`
+        : null,
+      count,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -7,7 +7,7 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ fetchData, api, name }) => {
-  const { next, previous } = api;
+  const { next, previous, totalPages, currentPage } = api;
 
   const handleNext = () => {
     if (next) {
@@ -21,19 +21,11 @@ const Pagination: React.FC<PaginationProps> = ({ fetchData, api, name }) => {
     }
   };
 
-  const handlePageClick = (url: any) => {
-    fetchData("", url);
+  const handlePageClick = (page: number) => {
+    fetchData("", page);
   };
 
-  // Generate an array of page numbers based on the count of planets
-  const maxPagesToShow = 6;
-  const pageCount = api.count ? Math.ceil(api.count / 10) : 0;
-  const pages = Array.from(
-    { length: Math.min(pageCount, maxPagesToShow) },
-    (_, index) => index + 1
-  );
-  const nextPage = next ? Number(next[next.length - 1]) - 1 : -100;
-  const prevPage = previous ? Number(previous[previous.length - 1]) + 1 : -100;
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
   return (
     <div className="flex max-xl:text-xs items-center justify-center mt-8 mb-10">
@@ -49,15 +41,11 @@ const Pagination: React.FC<PaginationProps> = ({ fetchData, api, name }) => {
           <button
             key={page}
             className={`px-4 py-2 mr-2 rounded-md shadow-md hover:bg-slate-600 ${
-              page === nextPage || page === prevPage
+              page === currentPage
                 ? "bg-slate-600 text-white"
                 : "bg-slate-500 text-white hover:bg-blue-600"
             }`}
-            onClick={() =>
-              handlePageClick(
-                `${process.env.NEXT_PUBLIC_API_LIVE_URL}/${name}/?page=${page}`
-              )
-            }
+            onClick={() => handlePageClick(page)}
           >
             {page}
           </button>

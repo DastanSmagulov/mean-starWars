@@ -11,12 +11,15 @@ export default function Planet() {
   const [api, setApi] = useState({
     totalPages: 0,
     currentPage: 1,
+    next: null,
+    previous: null,
+    count: 0,
   });
 
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchData = async (
-    searchTerm: any,
+    searchTerm = "",
     page = 1,
     limit = 10,
     link = `http://localhost:5000/api/planets`
@@ -30,11 +33,13 @@ export default function Planet() {
         },
       });
       console.log("Fetched data:", response.data);
-      // Ensure we handle cases where response.data.results is not defined
       setPlanets(response.data.results || []);
       setApi({
         totalPages: response.data.totalPages || 0,
         currentPage: response.data.currentPage || 1,
+        next: response.data.next || null,
+        previous: response.data.previous || null,
+        count: response.data.count || 0,
       });
     } catch (error) {
       console.error("Error fetching planets:", error);
@@ -64,7 +69,7 @@ export default function Planet() {
           {planets.length > 0 ? (
             planets.map((planet: any) => (
               <CardComponents
-                key={planet?._id}
+                key={planet?.url}
                 title={planet?.name?.toString()}
                 characteristics={"climate"}
                 characteristicsContent={planet?.climate?.toString()}
