@@ -21,13 +21,15 @@ router.get("/fetch", async (req, res) => {
 // Get all planets with pagination and search
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const { search = "", page = 1, limit = 10 } = req.query;
     const searchRegex = new RegExp(search, "i"); // Case-insensitive search
+    const offset = (page - 1) * limit;
 
     const planets = await Planet.find({ name: { $regex: searchRegex } })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .skip(parseInt(offset))
       .exec();
+
     const count = await Planet.countDocuments({
       name: { $regex: searchRegex },
     });
@@ -35,7 +37,7 @@ router.get("/", async (req, res) => {
     res.json({
       results: planets,
       totalPages: Math.ceil(count / limit),
-      currentPage: page,
+      currentPage: parseInt(page),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

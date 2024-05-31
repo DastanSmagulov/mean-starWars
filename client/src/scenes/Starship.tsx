@@ -55,7 +55,6 @@ export default function Starships() {
               secondCharacteristicsContent={ship?.model?.toString()}
               thirdCharacteristics={"cost in credits"}
               thirdCharacteristicsContent={ship?.cost_in_credits?.toString()}
-              // img={planet.img}
             />
           ))}
         </div>

@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CardComponents from "../components/CardComponent";
 
-export default function Planets() {
+export default function Planet() {
   const [planets, setPlanets] = useState<any[]>([]);
   const [api, setApi] = useState({
     totalPages: 0,
@@ -30,13 +30,15 @@ export default function Planets() {
         },
       });
       console.log("Fetched data:", response.data);
-      setPlanets(response.data);
+      // Ensure we handle cases where response.data.results is not defined
+      setPlanets(response.data.results || []);
       setApi({
-        totalPages: response.data.totalPages,
-        currentPage: response.data.currentPage,
+        totalPages: response.data.totalPages || 0,
+        currentPage: response.data.currentPage || 1,
       });
     } catch (error) {
       console.error("Error fetching planets:", error);
+      setPlanets([]); // Set planets to an empty array in case of error
     }
   };
 
@@ -48,7 +50,7 @@ export default function Planets() {
     <main className="flex min-h-screen flex-col items-center justify-between galaxy-box">
       <Header />
       <div className="pt-10">
-        <h1 className="text-2xl font-bold  text-center mb-4">Planets</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Planets</h1>
         <div className="grow max-md:hidden mr-4 mb-6">
           <input
             type="text"
@@ -59,19 +61,22 @@ export default function Planets() {
           />
         </div>
         <div className="grid grid-cols-3 gap-4 max-lg:grid-cols-1">
-          {planets?.map((planet: any) => (
-            <CardComponents
-              key={planet?._id}
-              title={planet?.name?.toString()}
-              characteristics={"climate"}
-              characteristicsContent={planet?.climate?.toString()}
-              secondCharacteristics={"population"}
-              secondCharacteristicsContent={planet?.population?.toString()}
-              thirdCharacteristics={"terrain"}
-              thirdCharacteristicsContent={planet?.terrain?.toString()}
-              // img={planet.img}
-            />
-          ))}
+          {planets.length > 0 ? (
+            planets.map((planet: any) => (
+              <CardComponents
+                key={planet?._id}
+                title={planet?.name?.toString()}
+                characteristics={"climate"}
+                characteristicsContent={planet?.climate?.toString()}
+                secondCharacteristics={"population"}
+                secondCharacteristicsContent={planet?.population?.toString()}
+                thirdCharacteristics={"terrain"}
+                thirdCharacteristicsContent={planet?.terrain?.toString()}
+              />
+            ))
+          ) : (
+            <p>No planets found</p>
+          )}
         </div>
       </div>
       <Pagination fetchData={fetchData} api={api} name={"planets"} />

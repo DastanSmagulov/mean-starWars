@@ -55,7 +55,6 @@ export default function People() {
               secondCharacteristicsContent={person?.birth_year?.toString()}
               thirdCharacteristics={"hair color"}
               thirdCharacteristicsContent={person?.hair_color?.toString()}
-              // img={planet.img}
             />
           ))}
         </div>
